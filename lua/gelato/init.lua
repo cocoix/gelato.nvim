@@ -30,6 +30,60 @@ local function build_options(opts)
   return options
 end
 
+local function match_gutter_background()
+  local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false })
+
+  local gutter_groups = {
+    "LineNr",
+    "LineNrAbove",
+    "LineNrBelow",
+    "CursorLineNr",
+    "SignColumn",
+    "FoldColumn",
+    "CursorLineSign",
+    "CursorLineFold",
+  }
+
+  for _, name in ipairs(gutter_groups) do
+    local highlight = vim.api.nvim_get_hl(0, { name = name, link = false })
+    highlight.bg = normal.bg
+    vim.api.nvim_set_hl(0, name, highlight)
+  end
+end
+
+local function customize_lualine()
+  local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false })
+  local groups = {
+    "StatusLine",
+    "StatusLineNC",
+    "LualineNormalC",
+    "LualineInsertC",
+    "LualineVisualC",
+    "LualineReplaceC",
+    "LualineCommandC",
+    "LualineInactiveC",
+  }
+
+  for _, name in ipairs(groups) do
+    local highlight = vim.api.nvim_get_hl(0, { name = name, link = false })
+    highlight.bg = normal.bg
+    vim.api.nvim_set_hl(0, name, highlight)
+  end
+
+  local palette = require("gelato.palette")
+  local mode_backgrounds = {
+    LualineNormalA = palette.base0D,
+    LualineInsertA = palette.base0B,
+    LualineCommandA = palette.base0E,
+  }
+
+  for name, background in pairs(mode_backgrounds) do
+    local highlight = vim.api.nvim_get_hl(0, { name = name, link = false })
+    highlight.bg = background
+    vim.api.nvim_set_hl(0, name, highlight)
+  end
+end
+
 ---Configure the tinted-nvim renderer without applying the colorscheme.
 ---@param opts? table tinted-nvim options
 ---@return table gelato
@@ -56,6 +110,8 @@ function M._load()
   end
 
   tinted_nvim().load(SCHEME_NAME, { colorscheme_event = false })
+  match_gutter_background()
+  customize_lualine()
   vim.g.colors_name = PUBLIC_NAME
 end
 
